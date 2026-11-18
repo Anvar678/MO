@@ -1,0 +1,28 @@
+ЛР1 | Вариант 14 | seed 10031
+Python 3.13.15
+SciPy 1.18.1; HiGHS через linprog, method=highs-ds, presolve=True
+Протокол статусов и числа итераций, формируемый интерфейсом SciPy (не нативный stdout HiGHS).
+
+Сценарий: Базовый
+Status: optimal
+Message: Optimization terminated successfully. (HiGHS Status 7: Optimal)
+Iterations: 4
+Objective: 4195862.484923811
+
+Сценарий: Дефицитный
+Status: optimal
+Message: Optimization terminated successfully. (HiGHS Status 7: Optimal)
+Iterations: 4
+Objective: 4225215.819826315
+
+Сценарий: Стрессовый
+Status: infeasible
+Message: The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is Infeasible)
+Iterations: 3
+Objective: N/A
+
+Сценарий: Жёсткий допустимый
+Status: optimal
+Message: Optimization terminated successfully. (HiGHS Status 7: Optimal)
+Iterations: 4
+Objective: 4395188.003005441

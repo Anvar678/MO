@@ -1,0 +1,153 @@
+{
+  "variant": 14,
+  "seed": 10031,
+  "units": "автомобили за период",
+  "nodes": [
+    {
+      "id": 1,
+      "balance": 35,
+      "x": 0,
+      "y": 3
+    },
+    {
+      "id": 2,
+      "balance": 30,
+      "x": 0,
+      "y": 2
+    },
+    {
+      "id": 3,
+      "balance": 25,
+      "x": 0,
+      "y": 1
+    },
+    {
+      "id": 4,
+      "balance": 30,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": 5,
+      "balance": -25,
+      "x": 4,
+      "y": 3
+    },
+    {
+      "id": 6,
+      "balance": -35,
+      "x": 4,
+      "y": 2
+    },
+    {
+      "id": 7,
+      "balance": -30,
+      "x": 4,
+      "y": 1
+    },
+    {
+      "id": 8,
+      "balance": -30,
+      "x": 4,
+      "y": 0
+    }
+  ],
+  "arcs": [
+    {
+      "from": 1,
+      "to": 5,
+      "capacity": 12,
+      "cost": 8
+    },
+    {
+      "from": 1,
+      "to": 6,
+      "capacity": 40,
+      "cost": 12
+    },
+    {
+      "from": 1,
+      "to": 7,
+      "capacity": 40,
+      "cost": 16
+    },
+    {
+      "from": 1,
+      "to": 8,
+      "capacity": 40,
+      "cost": 22
+    },
+    {
+      "from": 2,
+      "to": 5,
+      "capacity": 40,
+      "cost": 15
+    },
+    {
+      "from": 2,
+      "to": 6,
+      "capacity": 40,
+      "cost": 12
+    },
+    {
+      "from": 2,
+      "to": 7,
+      "capacity": 40,
+      "cost": 14
+    },
+    {
+      "from": 2,
+      "to": 8,
+      "capacity": 40,
+      "cost": 19
+    },
+    {
+      "from": 3,
+      "to": 5,
+      "capacity": 40,
+      "cost": 19
+    },
+    {
+      "from": 3,
+      "to": 6,
+      "capacity": 40,
+      "cost": 14
+    },
+    {
+      "from": 3,
+      "to": 7,
+      "capacity": 40,
+      "cost": 12
+    },
+    {
+      "from": 3,
+      "to": 8,
+      "capacity": 40,
+      "cost": 12
+    },
+    {
+      "from": 4,
+      "to": 5,
+      "capacity": 40,
+      "cost": 22
+    },
+    {
+      "from": 4,
+      "to": 6,
+      "capacity": 40,
+      "cost": 17
+    },
+    {
+      "from": 4,
+      "to": 7,
+      "capacity": 40,
+      "cost": 16
+    },
+    {
+      "from": 4,
+      "to": 8,
+      "capacity": 40,
+      "cost": 11
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+Python 3.13.15, SciPy 1.18.1
+HiGHS через scipy.optimize.linprog: highs-ds, presolve=True; протокол интерфейса SciPy.
+
+Базовый
+Статус: optimal
+Сообщение: Optimization terminated successfully. (HiGHS Status 7: Optimal)
+Итерации: 6
+Цель: 1411.0
+
+Перегрузка: ёмкость дуги снижена на 50%
+Статус: optimal
+Сообщение: Optimization terminated successfully. (HiGHS Status 7: Optimal)
+Итерации: 7
+Цель: 1461.0
+
+Отказ самой загруженной дуги
+Статус: optimal
+Сообщение: Optimization terminated successfully. (HiGHS Status 7: Optimal)
+Итерации: 9
+Цель: 1586.0
+
+Рост спроса на 20%
+Статус: infeasible
+Сообщение: The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is Infeasible)
+Итерации: 7
+Цель: нет

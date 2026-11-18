@@ -1,0 +1,45 @@
+{
+  "variant": 14,
+  "seed": 10031,
+  "source": "Учебная синтетическая генерация; диапазоны выбраны для данной ЛР",
+  "demand_t": 1000.0,
+  "ash_max_pct": 12.3,
+  "sulfur_max_pct": 1.25,
+  "suppliers": [
+    {
+      "name": "Поставщик 1",
+      "price_rub_t": 5297,
+      "ash_pct": 6.21,
+      "sulfur_pct": 0.678,
+      "capacity_t": 243
+    },
+    {
+      "name": "Поставщик 2",
+      "price_rub_t": 4319,
+      "ash_pct": 9.24,
+      "sulfur_pct": 1.607,
+      "capacity_t": 318
+    },
+    {
+      "name": "Поставщик 3",
+      "price_rub_t": 4225,
+      "ash_pct": 12.88,
+      "sulfur_pct": 1.082,
+      "capacity_t": 304
+    },
+    {
+      "name": "Поставщик 4",
+      "price_rub_t": 3854,
+      "ash_pct": 16.17,
+      "sulfur_pct": 0.56,
+      "capacity_t": 405
+    },
+    {
+      "name": "Поставщик 5",
+      "price_rub_t": 3137,
+      "ash_pct": 20.21,
+      "sulfur_pct": 2.152,
+      "capacity_t": 382
+    }
+  ]
+}
