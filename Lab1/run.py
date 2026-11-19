@@ -1,20 +1,38 @@
 from pathlib import Path
+import subprocess
+import sys
+
+ROOT = Path(__file__).resolve().parent
+RESULTS = ROOT / 'lab1_outputs'
+
+# Сохраняем нативный вывод HiGHS перенаправлением на уровне процесса.
+if __name__ == '__main__' and '--solver-worker' not in sys.argv:
+    RESULTS.mkdir(exist_ok=True)
+    log_path = RESULTS / 'solver.log'
+    with log_path.open('wb') as log_file:
+        worker = subprocess.run(
+            [sys.executable, '-X', 'utf8', '-u', str(Path(__file__).resolve()), '--solver-worker'],
+            stdout=log_file, stderr=subprocess.STDOUT,
+        )
+    lines = log_path.read_text(encoding='utf-8').splitlines()
+    log_path.write_text('\n'.join(line.rstrip() for line in lines) + '\n', encoding='utf-8')
+    print(f'Lab1: {"OK" if worker.returncode == 0 else "ERROR"} | {log_path}')
+    raise SystemExit(worker.returncode)
 import json
 import platform
-import sys
 import time
 import numpy as np
 import pandas as pd
 import scipy
 import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from scipy.optimize import linprog
 from IPython.display import display, Markdown
 
 SEED = 10031
 VARIANT = 14
-ROOT = Path(__file__).resolve().parent
-OUTPUT_DIR = ROOT / 'lab1_outputs'
+OUTPUT_DIR = RESULTS
 OUTPUT_DIR.mkdir(exist_ok=True)
 plt.rcParams.update({'font.family': 'DejaVu Sans', 'figure.dpi': 110, 'savefig.dpi': 160, 'axes.grid': True, 'grid.alpha': 0.22})
 pd.set_option('display.float_format', lambda v: f'{v:,.3f}')
@@ -49,7 +67,7 @@ ax[1].axhline(dataset['sulfur_max_pct'], ls='--', color='royalblue', label='Ма
 ax[1].set(title='Качество отдельных углей', xlabel='Зольность, %', ylabel='Сера, %')
 ax[1].legend(fontsize=8, loc='upper left')
 fig.savefig(OUTPUT_DIR / '01_suppliers.png', bbox_inches='tight')
-plt.show()
+plt.close(fig)
 
 prices = np.array([s['price_rub_t'] for s in dataset['suppliers']], dtype=float)
 ashes = np.array([s['ash_pct'] for s in dataset['suppliers']], dtype=float)
@@ -60,7 +78,7 @@ A_MAX = float(dataset['ash_max_pct'])
 S_MAX = float(dataset['sulfur_max_pct'])
 
 
-def solve_mix(caps=None, ash_limit=None, sulfur_limit=None):
+def solve_mix(caps=None, ash_limit=None, sulfur_limit=None, *, method='highs-ds', disp=True):
     cap = np.asarray(limits if caps is None else caps, dtype=float)
     a_limit = A_MAX if ash_limit is None else float(ash_limit)
     s_limit = S_MAX if sulfur_limit is None else float(sulfur_limit)
@@ -71,8 +89,8 @@ def solve_mix(caps=None, ash_limit=None, sulfur_limit=None):
         A_eq=np.ones((1, len(prices))),
         b_eq=np.array([D]),
         bounds=list(zip(np.zeros(len(cap)), cap)),
-        method='highs-ds',
-        options={'presolve': True, 'primal_feasibility_tolerance': 1e-9,
+        method=method,
+        options={'presolve': True, 'disp': disp, 'primal_feasibility_tolerance': 1e-9,
                  'dual_feasibility_tolerance': 1e-9}
     )
 
@@ -119,7 +137,7 @@ ax[1].pie(base.x * prices, labels=names, autopct='%1.1f%%', startangle=95, color
           wedgeprops={'linewidth': 0.7, 'edgecolor': 'white'})
 ax[1].set_title('Доли поставщиков в стоимости закупки')
 fig.savefig(OUTPUT_DIR / '02_optimal_mix.png', bbox_inches='tight')
-plt.show()
+plt.close(fig)
 
 def independent_check(x, source, caps=None, ash_limit=None, sulfur_limit=None):
     suppliers = source['suppliers']
@@ -171,6 +189,7 @@ economic_table = pd.DataFrame({
     'Выгода от +1 единицы RHS, ₽': -np.r_[q_shadow, u_shadow]
 })
 display(economic_table)
+economic_table.to_csv(OUTPUT_DIR / 'shadow_prices.csv', index=False, encoding='utf-8-sig')
 print('Единицы: качество — ₽/(%·т), лимиты поставщиков — ₽/т дополнительной поставки.')
 print(f'Увеличение допустимой зольности на 0,01 п.п.: локальный прогноз {q_shadow[0] * D * 0.01:,.2f} ₽')
 print(f'Увеличение допустимой серы на 0,01 п.п.: локальный прогноз {q_shadow[1] * D * 0.01:,.2f} ₽')
@@ -234,7 +253,8 @@ scenario_results = {}
 scenario_rows = []
 scenario_check_rows = []
 for spec in scenario_specs:
-    name = spec['Название']
+    name = str(spec['Название'])
+    print(f'\nСценарий: {name}', flush=True)
     result = solve_mix(caps=spec['caps'], ash_limit=spec['ash'], sulfur_limit=spec['sulfur'])
     scenario_results[name] = result
     verified = independent_check(result.x, dataset, caps=spec['caps'],
@@ -244,11 +264,16 @@ for spec in scenario_specs:
         'Статус': status_names.get(result.status, str(result.status)),
         'Стоимость, ₽': result.fun if result.success else np.nan,
         'Изменение, ₽': result.fun - base.fun if result.success else np.nan,
+        'Лимит поставщика 2, т': spec['caps'][1],
+        'Лимит поставщика 3, т': spec['caps'][2],
+        'Лимит зольности, %': spec['ash'],
+        'Лимит серы, %': spec['sulfur'],
         'Зольность, %': verified['средняя_зольность'] if verified else np.nan,
         'Сера, %': verified['средняя_сера'] if verified else np.nan,
         'Итерации HiGHS': result.nit
     })
     if result.success:
+        assert abs(verified['стоимость_независимая'] - result.fun) <= 1e-7
         scenario_check_rows.append({'Сценарий': name, 'Проверка допустимости': verified['допустимо'],
                                     'Максимальная невязка': verified['максимальное_нарушение'],
                                     'Расхождение стоимости, ₽': abs(verified['стоимость_независимая'] - result.fun)})
@@ -271,7 +296,7 @@ ax.set(xticks=positions, xticklabels=feasible_names, ylabel='Тонны',
        title='Оптимальная структура закупок в допустимых сценариях')
 ax.legend(ncol=5, loc='upper center', bbox_to_anchor=(0.5, -0.10), frameon=False)
 fig.savefig(OUTPUT_DIR / '03_scenario_composition.png', bbox_inches='tight')
-plt.show()
+plt.close(fig)
 
 display(pd.DataFrame({'Поставщик': names, **{name: scenario_results[name].x for name in feasible_names}}))
 pd.DataFrame({'Поставщик': names, **{name: scenario_results[name].x for name in feasible_names}}).to_csv(OUTPUT_DIR / 'scenario_plans.csv', index=False, encoding='utf-8-sig')
@@ -298,7 +323,7 @@ ax[1].set(xticks=positions, xticklabels=feasible_names, title='Использо�
 ax[1].tick_params(axis='x', rotation=12)
 ax[1].legend(fontsize=8)
 fig.savefig(OUTPUT_DIR / '04_scenario_comparison.png', bbox_inches='tight')
-plt.show()
+plt.close(fig)
 
 stress = scenario_results['Стрессовый']
 assert stress.status == 2
@@ -309,7 +334,7 @@ ash_aux = linprog(
     A_eq=np.ones((1, 5)),
     b_eq=np.array([D]),
     bounds=list(zip(np.zeros(5), cap_stress)),
-    method='highs-ds'
+    method='highs-ds', options={'disp': True}
 )
 if not ash_aux.success:
     print('Даже баланс массы и требование по сере без ограничения зольности несовместны.')
@@ -326,7 +351,7 @@ else:
 ash_grid = np.linspace(A_MAX - 2.0, A_MAX + 2.0, 41)
 actual_costs = []
 for a in ash_grid:
-    rr = solve_mix(ash_limit=float(a))
+    rr = solve_mix(ash_limit=float(a), disp=False)
     actual_costs.append(rr.fun / 1e6 if rr.success else np.nan)
 predicted_costs = (base.fun + q_shadow[0] * D * (ash_grid - A_MAX)) / 1e6
 fig, ax = plt.subplots(figsize=(10.5, 4.8), constrained_layout=True)
@@ -337,7 +362,7 @@ ax.set(title='Зависимость минимальной стоимости �
        xlabel='Лимит средней зольности, %', ylabel='Минимальная стоимость, млн ₽')
 ax.legend()
 fig.savefig(OUTPUT_DIR / '05_sensitivity.png', bbox_inches='tight')
-plt.show()
+plt.close(fig)
 
 base_active = [names[i] for i in range(5) if abs(base.x[i] - limits[i]) < 1e-7]
 base_zero = [names[i] for i in range(5) if base.x[i] < 1e-7]
@@ -348,10 +373,7 @@ tight_res = scenario_results['Жёсткий допустимый']
 method_rows = []
 for method in ('highs-ds', 'highs-ipm'):
     started = time.perf_counter()
-    result = linprog(prices, A_ub=np.vstack((ashes, sulfurs)),
-                     b_ub=[A_MAX * D, S_MAX * D], A_eq=np.ones((1, len(prices))),
-                     b_eq=[D], bounds=list(zip(np.zeros(len(limits)), limits)),
-                     method=method, options={'presolve': True})
+    result = solve_mix(method=method, disp=False)
     elapsed = time.perf_counter() - started
     assert result.success and np.isclose(result.fun, base.fun, atol=1e-5)
     method_rows.append({'Метод': method, 'Статус': status_names[result.status],
@@ -365,6 +387,8 @@ conclusion = f"""**Базовый результат.** Оптимальная �
 **Ограниченность поставок.** Полностью загружены: **{', '.join(base_active) if base_active else 'нет'}**. Нулевые закупки: **{', '.join(base_zero) if base_zero else 'нет'}**. Все положительные закупки могут сосуществовать в оптимуме: даже сравнительно дорогой уголь позволяет разбавлять более загрязнённый дешёвый уголь.
 
 **Дефицит.** Сокращение мощности поставщика № 2 на 20% приводит к стоимости **{deficit_res.fun:,.2f} ₽**, что на **{deficit_res.fun-base.fun:,.2f} ₽** больше базовой. Рост цены обусловлен необходимостью изменить состав смеси, сохранив экологические требования.
+
+При дефиците закупка у поставщика № 2 падает на {base.x[1] - deficit_res.x[1]:.1f} т. Закупки у поставщиков № 1 и № 5 растут на {deficit_res.x[0] - base.x[0]:.1f} и {deficit_res.x[4] - base.x[4]:.1f} т. Первый поставляет уголь с низкой зольностью, пятый — самый дешёвый уголь с высокой зольностью и содержанием серы. Изменение состава позволяет соблюдать оба норматива.
 
 **Стресс.** Основной стрессовый сценарий имеет статус **{status_names[stress.status]}**. При одновременно заданных сокращениях отгрузки и сере ≤ 0,9% даже минимально достижимая зольность равна **{min_ash_achievable:.3f}%**, то есть выше допустимых 10,5%. Для восстановления допустимости придётся ослабить хотя бы одно условие или найти дополнительные поставки.
 
@@ -404,12 +428,18 @@ report = f"""# Лабораторная работа № 1. Вариант 14. S
 {scenario_df.to_string(index=False)}
 ```
 
+Объёмы закупок по сценариям приведены в [таблице](scenario_plans.csv). В базовом оптимуме задействованы все пять поставщиков. Поставщик № 1 помогает выполнить норматив по зольности, а поставщик № 4 — по сере.
+
+![Состав закупок по сценариям](03_scenario_composition.png)
+
 ## Теневые оценки
 ```
 {economic_table.to_string(index=False)}
 ```
 
 Единицы маржинальных оценок качества — ₽/(%·т), ограничений поставщиков — ₽/т. Приращения неодинаковых единиц нельзя сравнивать напрямую. Для увеличения поставок при прочих равных выгоднее лимит с наибольшей положительной выгодой на тонну; см. таблицу. Теневые цены локальны и могут измениться при смене оптимального базиса.
+
+В первую очередь выгодно расширить лимит поставщика № {int(np.argmin(u_shadow)) + 1}. Дополнительная тонна его угля позволяет сэкономить около {-float(np.min(u_shadow)):.2f} ₽ при прочих равных.
 
 Проверка локального прогноза (изменение нормы на 0,01 п.п. или лимита на 5 т):
 ```
@@ -440,13 +470,13 @@ requirements = '\n'.join([
 
 log_lines = [f'ЛР1 | Вариант {VARIANT} | seed {SEED}', f'Python {platform.python_version()}',
              f'SciPy {scipy.__version__}; HiGHS через linprog, method=highs-ds, presolve=True',
-             'Протокол статусов и числа итераций, формируемый интерфейсом SciPy (не нативный stdout HiGHS).', '']
+                            'Сводка сценариев SciPy:', '']
 for spec in scenario_specs:
     res = scenario_results[spec['Название']]
     log_lines.extend([f"Сценарий: {spec['Название']}", f'Status: {status_names.get(res.status, str(res.status))}',
                       f'Message: {res.message}', f'Iterations: {res.nit}',
                       f'Objective: {res.fun if res.success else "N/A"}', ''])
-(OUTPUT_DIR / 'solver.log').write_text('\n'.join(log_lines), encoding='utf-8')
+print('\n'.join(log_lines))
 
 for file in sorted(OUTPUT_DIR.iterdir()):
     print(file.name, '|', f'{file.stat().st_size:,} байт')

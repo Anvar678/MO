@@ -1,7 +1,323 @@
+Вариант 14; seed 10031; Python 3.13.15; SciPy 1.18.1
+     Поставщик  Цена, ₽/т  Зольность, %  Сера, %  Лимит, т
+0  Поставщик 1       5297         6.210    0.678       243
+1  Поставщик 2       4319         9.240    1.607       318
+2  Поставщик 3       4225        12.880    1.082       304
+3  Поставщик 4       3854        16.170    0.560       405
+4  Поставщик 5       3137        20.210    2.152       382
+Потребность: 1000 т; зольность ≤ 12.3%; сера ≤ 1.25%
+Совокупный доступный объём: 1652 т
+Running HiGHS 1.12.0 (git hash: 4f96ee8): Copyright (c) 2025 HiGHS under MIT licence terms
+LP has 3 rows; 5 cols; 15 nonzeros
+Coefficient ranges:
+  Matrix  [6e-01, 2e+01]
+  Cost    [3e+03, 5e+03]
+  Bound   [2e+02, 4e+02]
+  RHS     [1e+03, 1e+04]
+Presolving model
+3 rows, 5 cols, 15 nonzeros  0s
+Dependent equations search running on 1 equations with time limit of 1000.00s
+Dependent equations search removed 0 rows and 0 nonzeros in 0.00s (limit = 1000.00s)
+3 rows, 5 cols, 15 nonzeros  0s
+Presolve reductions: rows 3(-0); columns 5(-0); nonzeros 15(-0) - Not reduced
+Problem not reduced by presolve: solving the LP
+Using EKK dual simplex solver - serial
+  Iteration        Objective     Infeasibilities num(sum)
+          0     0.0000000000e+00 Pr: 1(4000) 0s
+          4     4.1958624849e+06 Pr: 0(0) 0s
+
+Model status        : Optimal
+Simplex   iterations: 4
+Objective value     :  4.1958624849e+06
+P-D objective error :  0.0000000000e+00
+HiGHS run time      :          0.00
+Статус: optimal
+Сообщение: Optimization terminated successfully. (HiGHS Status 7: Optimal)
+Итераций: 4
+Минимальная стоимость: 4,195,862.48 ₽
+     Поставщик  Закупка, т  ...  Цена, ₽/т    Затраты, ₽
+0  Поставщик 1     113.992  ...  5,297.000   603,813.660
+1  Поставщик 2     318.000  ...  4,319.000 1,373,442.000
+2  Поставщик 3     304.000  ...  4,225.000 1,284,400.000
+3  Поставщик 4     147.856  ...  3,854.000   569,836.023
+4  Поставщик 5     116.153  ...  3,137.000   364,370.802
+
+[5 rows x 6 columns]
+Итоговая смесь: 1000 т; стоимость 4,195,862.48 ₽; 4,195.86 ₽/т
+Средняя зольность: 12.300000% (лимит 12.30%)
+Средняя сера: 1.250000% (лимит 1.25%)
+Активные верхние границы: Поставщик 2, Поставщик 3
+Нулевые закупки: нет
+                    Проверка  Нарушение
+0            Баланс массы, т      0.000
+1  Превышение зольности, %·т      0.000
+2       Превышение серы, %·т      0.000
+3         Нарушение x ≥ 0, т      0.000
+4     Превышение поставок, т      0.000
+Допустимость подтверждена: True
+Независимая стоимость: 4,195,862.484924 ₽
+Разность с результатом HiGHS: 0.000000000 ₽
+          Ограничение  ...  Выгода от +1 единицы RHS, ₽
+0     Зольность смеси  ...                      145.831
+1          Сера смеси  ...                       80.303
+2  Лимит: Поставщик 1  ...                       -0.000
+3  Лимит: Поставщик 2  ...                      461.530
+4  Лимит: Поставщик 3  ...                       66.865
+5  Лимит: Поставщик 4  ...                       -0.000
+6  Лимит: Поставщик 5  ...                       -0.000
+
+[7 rows x 5 columns]
+Единицы: качество — ₽/(%·т), лимиты поставщиков — ₽/т дополнительной поставки.
+Увеличение допустимой зольности на 0,01 п.п.: локальный прогноз -1,458.31 ₽
+Увеличение допустимой серы на 0,01 п.п.: локальный прогноз -803.03 ₽
+                                            Проверка  Значение
+0                       Макс. невязка стационарности     0.000
+1     Макс. произведение оценка × остаток (качество)     0.000
+2  Макс. произведение оценка × остаток (верхние г...     0.000
+3  Макс. произведение оценка × остаток (нижние гр...     0.000
+marginals качества ≤ 0: True
+marginals верхних границ ≤ 0: True
+marginals нижних границ ≥ 0: True
+Running HiGHS 1.12.0 (git hash: 4f96ee8): Copyright (c) 2025 HiGHS under MIT licence terms
+LP has 3 rows; 5 cols; 15 nonzeros
+Coefficient ranges:
+  Matrix  [6e-01, 2e+01]
+  Cost    [3e+03, 5e+03]
+  Bound   [2e+02, 4e+02]
+  RHS     [1e+03, 1e+04]
+Presolving model
+3 rows, 5 cols, 15 nonzeros  0s
+Dependent equations search running on 1 equations with time limit of 1000.00s
+Dependent equations search removed 0 rows and 0 nonzeros in 0.00s (limit = 1000.00s)
+3 rows, 5 cols, 15 nonzeros  0s
+Presolve reductions: rows 3(-0); columns 5(-0); nonzeros 15(-0) - Not reduced
+Problem not reduced by presolve: solving the LP
+Using EKK dual simplex solver - serial
+  Iteration        Objective     Infeasibilities num(sum)
+          0     0.0000000000e+00 Pr: 1(4000) 0s
+          4     4.1944041759e+06 Pr: 0(0) 0s
+
+Model status        : Optimal
+Simplex   iterations: 4
+Objective value     :  4.1944041759e+06
+P-D objective error :  0.0000000000e+00
+HiGHS run time      :          0.00
+Running HiGHS 1.12.0 (git hash: 4f96ee8): Copyright (c) 2025 HiGHS under MIT licence terms
+LP has 3 rows; 5 cols; 15 nonzeros
+Coefficient ranges:
+  Matrix  [6e-01, 2e+01]
+  Cost    [3e+03, 5e+03]
+  Bound   [2e+02, 4e+02]
+  RHS     [1e+03, 1e+04]
+Presolving model
+3 rows, 5 cols, 15 nonzeros  0s
+Dependent equations search running on 1 equations with time limit of 1000.00s
+Dependent equations search removed 0 rows and 0 nonzeros in 0.00s (limit = 1000.00s)
+3 rows, 5 cols, 15 nonzeros  0s
+Presolve reductions: rows 3(-0); columns 5(-0); nonzeros 15(-0) - Not reduced
+Problem not reduced by presolve: solving the LP
+Using EKK dual simplex solver - serial
+  Iteration        Objective     Infeasibilities num(sum)
+          0     0.0000000000e+00 Pr: 1(4000) 0s
+          4     4.1950594501e+06 Pr: 0(0) 0s
+
+Model status        : Optimal
+Simplex   iterations: 4
+Objective value     :  4.1950594501e+06
+P-D objective error :  0.0000000000e+00
+HiGHS run time      :          0.00
+Running HiGHS 1.12.0 (git hash: 4f96ee8): Copyright (c) 2025 HiGHS under MIT licence terms
+LP has 3 rows; 5 cols; 15 nonzeros
+Coefficient ranges:
+  Matrix  [6e-01, 2e+01]
+  Cost    [3e+03, 5e+03]
+  Bound   [2e+02, 4e+02]
+  RHS     [1e+03, 1e+04]
+Presolving model
+3 rows, 5 cols, 15 nonzeros  0s
+Dependent equations search running on 1 equations with time limit of 1000.00s
+Dependent equations search removed 0 rows and 0 nonzeros in 0.00s (limit = 1000.00s)
+3 rows, 5 cols, 15 nonzeros  0s
+Presolve reductions: rows 3(-0); columns 5(-0); nonzeros 15(-0) - Not reduced
+Problem not reduced by presolve: solving the LP
+Using EKK dual simplex solver - serial
+  Iteration        Objective     Infeasibilities num(sum)
+          0     0.0000000000e+00 Pr: 1(4000) 0s
+          4     4.1935548328e+06 Pr: 0(0) 0s
+
+Model status        : Optimal
+Simplex   iterations: 4
+Objective value     :  4.1935548328e+06
+P-D objective error :  0.0000000000e+00
+HiGHS run time      :          0.00
+                  Изменение  ...  Разница прогноза, ₽
+0     Зольность: +0,01 п.п.  ...                0.000
+1          Сера: +0,01 п.п.  ...                0.000
+2  Поставщик 2: +5 т лимита  ...                0.000
+
+[3 rows x 4 columns]
+
+Сценарий: Базовый
+Running HiGHS 1.12.0 (git hash: 4f96ee8): Copyright (c) 2025 HiGHS under MIT licence terms
+LP has 3 rows; 5 cols; 15 nonzeros
+Coefficient ranges:
+  Matrix  [6e-01, 2e+01]
+  Cost    [3e+03, 5e+03]
+  Bound   [2e+02, 4e+02]
+  RHS     [1e+03, 1e+04]
+Presolving model
+3 rows, 5 cols, 15 nonzeros  0s
+Dependent equations search running on 1 equations with time limit of 1000.00s
+Dependent equations search removed 0 rows and 0 nonzeros in 0.00s (limit = 1000.00s)
+3 rows, 5 cols, 15 nonzeros  0s
+Presolve reductions: rows 3(-0); columns 5(-0); nonzeros 15(-0) - Not reduced
+Problem not reduced by presolve: solving the LP
+Using EKK dual simplex solver - serial
+  Iteration        Objective     Infeasibilities num(sum)
+          0     0.0000000000e+00 Pr: 1(4000) 0s
+          4     4.1958624849e+06 Pr: 0(0) 0s
+
+Model status        : Optimal
+Simplex   iterations: 4
+Objective value     :  4.1958624849e+06
+P-D objective error :  0.0000000000e+00
+HiGHS run time      :          0.00
+
+Сценарий: Дефицитный
+Running HiGHS 1.12.0 (git hash: 4f96ee8): Copyright (c) 2025 HiGHS under MIT licence terms
+LP has 3 rows; 5 cols; 15 nonzeros
+Coefficient ranges:
+  Matrix  [6e-01, 2e+01]
+  Cost    [3e+03, 5e+03]
+  Bound   [2e+02, 4e+02]
+  RHS     [1e+03, 1e+04]
+Presolving model
+3 rows, 5 cols, 15 nonzeros  0s
+Dependent equations search running on 1 equations with time limit of 1000.00s
+Dependent equations search removed 0 rows and 0 nonzeros in 0.00s (limit = 1000.00s)
+3 rows, 5 cols, 15 nonzeros  0s
+Presolve reductions: rows 3(-0); columns 5(-0); nonzeros 15(-0) - Not reduced
+Problem not reduced by presolve: solving the LP
+Using EKK dual simplex solver - serial
+  Iteration        Objective     Infeasibilities num(sum)
+          0     0.0000000000e+00 Pr: 1(4000) 0s
+          4     4.2252158198e+06 Pr: 0(0) 0s
+
+Model status        : Optimal
+Simplex   iterations: 4
+Objective value     :  4.2252158198e+06
+P-D objective error :  0.0000000000e+00
+HiGHS run time      :          0.00
+
+Сценарий: Стрессовый
+Running HiGHS 1.12.0 (git hash: 4f96ee8): Copyright (c) 2025 HiGHS under MIT licence terms
+LP has 3 rows; 5 cols; 15 nonzeros
+Coefficient ranges:
+  Matrix  [6e-01, 2e+01]
+  Cost    [3e+03, 5e+03]
+  Bound   [2e+02, 4e+02]
+  RHS     [9e+02, 1e+04]
+Presolving model
+3 rows, 5 cols, 15 nonzeros  0s
+Dependent equations search running on 1 equations with time limit of 1000.00s
+Dependent equations search removed 0 rows and 0 nonzeros in 0.00s (limit = 1000.00s)
+3 rows, 5 cols, 15 nonzeros  0s
+Presolve reductions: rows 3(-0); columns 5(-0); nonzeros 15(-0) - Not reduced
+Problem not reduced by presolve: solving the LP
+Using EKK dual simplex solver - serial
+  Iteration        Objective     Infeasibilities num(sum)
+          0     0.0000000000e+00 Pr: 1(4000) 0s
+          3     4.5323849243e+06 0s
+
+Model status        : Infeasible
+Simplex   iterations: 3
+Objective value     :  4.5323578753e+06
+P-D objective error :  2.9839816616e-06
+HiGHS run time      :          0.00
+
+Сценарий: Жёсткий допустимый
+Running HiGHS 1.12.0 (git hash: 4f96ee8): Copyright (c) 2025 HiGHS under MIT licence terms
+LP has 3 rows; 5 cols; 15 nonzeros
+Coefficient ranges:
+  Matrix  [6e-01, 2e+01]
+  Cost    [3e+03, 5e+03]
+  Bound   [2e+02, 4e+02]
+  RHS     [1e+03, 1e+04]
+Presolving model
+3 rows, 5 cols, 15 nonzeros  0s
+Dependent equations search running on 1 equations with time limit of 1000.00s
+Dependent equations search removed 0 rows and 0 nonzeros in 0.00s (limit = 1000.00s)
+3 rows, 5 cols, 15 nonzeros  0s
+Presolve reductions: rows 3(-0); columns 5(-0); nonzeros 15(-0) - Not reduced
+Problem not reduced by presolve: solving the LP
+Using EKK dual simplex solver - serial
+  Iteration        Objective     Infeasibilities num(sum)
+          0     0.0000000000e+00 Pr: 1(4000) 0s
+          4     4.3951880030e+06 Pr: 0(0) 0s
+
+Model status        : Optimal
+Simplex   iterations: 4
+Objective value     :  4.3951880030e+06
+P-D objective error :  0.0000000000e+00
+HiGHS run time      :          0.00
+             Сценарий      Статус  ...  Сера, %  Итерации HiGHS
+0             Базовый     optimal  ...    1.250               4
+1          Дефицитный     optimal  ...    1.250               4
+2          Стрессовый  infeasible  ...      NaN               3
+3  Жёсткий допустимый     optimal  ...    1.000               4
+
+[4 rows x 11 columns]
+             Сценарий  ...  Расхождение стоимости, ₽
+0             Базовый  ...                     0.000
+1          Дефицитный  ...                     0.000
+2  Жёсткий допустимый  ...                     0.000
+
+[3 rows x 4 columns]
+     Поставщик  Базовый  Дефицитный  Жёсткий допустимый
+0  Поставщик 1  113.992     173.423             236.404
+1  Поставщик 2  318.000     254.400             254.400
+2  Поставщик 3  304.000     304.000             243.200
+3  Поставщик 4  147.856     114.602             254.189
+4  Поставщик 5  116.153     153.575              11.807
+Running HiGHS 1.12.0 (git hash: 4f96ee8): Copyright (c) 2025 HiGHS under MIT licence terms
+LP has 2 rows; 5 cols; 10 nonzeros
+Coefficient ranges:
+  Matrix  [6e-01, 2e+00]
+  Cost    [6e+00, 2e+01]
+  Bound   [2e+02, 4e+02]
+  RHS     [9e+02, 1e+03]
+Presolving model
+2 rows, 5 cols, 10 nonzeros  0s
+Dependent equations search running on 1 equations with time limit of 1000.00s
+Dependent equations search removed 0 rows and 0 nonzeros in 0.00s (limit = 1000.00s)
+2 rows, 5 cols, 10 nonzeros  0s
+Presolve reductions: rows 2(-0); columns 5(-0); nonzeros 10(-0) - Not reduced
+Problem not reduced by presolve: solving the LP
+Using EKK dual simplex solver - serial
+  Iteration        Objective     Infeasibilities num(sum)
+          0     0.0000000000e+00 Pr: 1(1000) 0s
+          3     1.1707071467e+04 Pr: 0(0) 0s
+
+Model status        : Optimal
+Simplex   iterations: 3
+Objective value     :  1.1707071467e+04
+P-D objective error :  7.7684317739e-17
+HiGHS run time      :          0.00
+При сере ≤ 0,9% и сокращённых поставках минимальная зольность = 11.707071%
+Стрессовый лимит зольности = 10,500000%
+Неустранимое превышение по зольности = 1.207071 процентного пункта
+Следовательно, одновременно выполнить все ограничения стрессового сценария нельзя.
+     Поставщик  Минимизация зольности, т  Доступно при стрессе, т
+0  Поставщик 1                   243.000                  243.000
+1  Поставщик 2                   243.013                  254.400
+2  Поставщик 3                   108.987                  243.200
+3  Поставщик 4                   405.000                  405.000
+4  Поставщик 5                     0.000                  382.000
+<IPython.core.display.Markdown object>
 ЛР1 | Вариант 14 | seed 10031
 Python 3.13.15
 SciPy 1.18.1; HiGHS через linprog, method=highs-ds, presolve=True
-Протокол статусов и числа итераций, формируемый интерфейсом SciPy (не нативный stdout HiGHS).
+Сводка сценариев SciPy:
 
 Сценарий: Базовый
 Status: optimal
@@ -26,3 +342,20 @@ Status: optimal
 Message: Optimization terminated successfully. (HiGHS Status 7: Optimal)
 Iterations: 4
 Objective: 4395188.003005441
+
+01_suppliers.png | 73,156 байт
+02_optimal_mix.png | 103,903 байт
+03_scenario_composition.png | 37,114 байт
+04_scenario_comparison.png | 69,322 байт
+05_sensitivity.png | 87,596 байт
+methods.csv | 209 байт
+report.md | 11,614 байт
+requirements.txt | 81 байт
+scenario_plans.csv | 423 байт
+scenario_verification.csv | 285 байт
+scenarios.csv | 667 байт
+shadow_comparison.csv | 376 байт
+shadow_prices.csv | 649 байт
+solution.csv | 536 байт
+solver.log | 16,610 байт
+verification.csv | 279 байт

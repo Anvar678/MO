@@ -1,5 +1,24 @@
 """Балансировка такси: ЛП, сценарии и независимая проверка."""
 from pathlib import Path
+import subprocess
+import sys
+
+ROOT = Path(__file__).resolve().parent
+RESULTS = ROOT / 'outputs'
+
+# Сохраняем нативный вывод HiGHS перенаправлением на уровне процесса.
+if __name__ == '__main__' and '--solver-worker' not in sys.argv:
+    RESULTS.mkdir(exist_ok=True)
+    log_path = RESULTS / 'solver.log'
+    with log_path.open('wb') as log_file:
+        worker = subprocess.run(
+            [sys.executable, '-X', 'utf8', '-u', str(Path(__file__).resolve()), '--solver-worker'],
+            stdout=log_file, stderr=subprocess.STDOUT,
+        )
+    lines = log_path.read_text(encoding='utf-8').splitlines()
+    log_path.write_text('\n'.join(line.rstrip() for line in lines) + '\n', encoding='utf-8')
+    print(f'Lab2: {"OK" if worker.returncode == 0 else "ERROR"} | {log_path}')
+    raise SystemExit(worker.returncode)
 import json
 import platform
 import time
@@ -11,8 +30,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-ROOT = Path(__file__).resolve().parent
-OUT = ROOT / 'outputs'
+OUT = RESULTS
 OUT.mkdir(exist_ok=True)
 data = json.loads((ROOT / 'data' / 'taxi.json').read_text(encoding='utf-8'))
 nodes, arcs = data['nodes'], data['arcs']
@@ -27,8 +45,12 @@ for k, arc in enumerate(arcs):
 
 def solve(b, caps):
     return linprog(cost, A_eq=A, b_eq=b, bounds=list(zip(np.zeros(m), caps)),
-                   method='highs-ds', options={'presolve': True,
+                   method='highs-ds', options={'presolve': True, 'disp': True,
                    'primal_feasibility_tolerance': 1e-9, 'dual_feasibility_tolerance': 1e-9})
+
+def solve_scenario(name, b, caps):
+    print(f'\nСценарий: {name}', flush=True)
+    return name, b, caps, solve(b, caps)
 
 def verify(x, b, caps):
     # Проверка строит потоки непосредственно по списку дуг, не используя матрицу модели.
@@ -51,7 +73,8 @@ def greedy(b, caps):
         demand[j] -= x[k]
     return x
 
-base = solve(balance, capacity)
+baseline = solve_scenario('Базовый', balance, capacity)
+base = baseline[3]
 if not base.success:
     raise RuntimeError(f'Базовая модель не решена: {base.message}')
 net, residual, violation, independent_cost = verify(base.x, balance, capacity)
@@ -63,15 +86,17 @@ reduced_caps = capacity.copy()
 reduced_caps[closed] *= 0.5
 growth_balance = balance.copy()
 growth_balance[growth_balance < 0] *= 1.2
-scenarios = [('Базовый', balance, capacity, base),
-             ('Перегрузка: ёмкость дуги снижена на 50%', balance, reduced_caps, solve(balance, reduced_caps)),
-             ('Отказ самой загруженной дуги', balance, closed_caps, solve(balance, closed_caps)),
-             ('Рост спроса на 20%', growth_balance, capacity, solve(growth_balance, capacity))]
+scenarios = [baseline,
+             solve_scenario('Перегрузка: ёмкость дуги снижена на 50%', balance, reduced_caps),
+             solve_scenario('Отказ самой загруженной дуги', balance, closed_caps),
+             solve_scenario('Рост спроса на 20%', growth_balance, capacity)]
 status = {0: 'optimal', 1: 'time_limit / iteration_limit', 2: 'infeasible', 3: 'unbounded', 4: 'solver_error'}
 rows, checks, log = [], [], [f'Python {platform.python_version()}, SciPy {scipy.__version__}',
-                            'HiGHS через scipy.optimize.linprog: highs-ds, presolve=True; протокол интерфейса SciPy.']
+                            'Сводка сценариев SciPy (highs-ds, presolve=True).']
 for name, b, caps, result in scenarios:
     rows.append({'Сценарий': name, 'Статус': status.get(result.status, str(result.status)),
+                 'Спрос, авто': -b[b < 0].sum(), 'Запас, авто': b[b > 0].sum(),
+                 'Ёмкость выбранной дуги, авто': caps[closed],
                  'Стоимость': result.fun if result.success else np.nan,
                  'Изменение стоимости': result.fun - base.fun if result.success else np.nan,
                  'Итерации': result.nit})
@@ -84,12 +109,14 @@ for name, b, caps, result in scenarios:
         checks.append({'Сценарий': name, 'Максимальное нарушение': err,
                        'Независимая стоимость': value, 'Расхождение стоимости': abs(value - result.fun)})
         plan = pd.DataFrame(arcs)
+        plan['capacity'] = caps
         plan['flow'] = result.x
+        plan['slack'] = caps - result.x
         plan['scenario'] = name
         plan.to_csv(OUT / ('plan_' + str(len(checks)) + '.csv'), index=False, encoding='utf-8-sig')
 pd.DataFrame(rows).to_csv(OUT / 'scenarios.csv', index=False, encoding='utf-8-sig')
 pd.DataFrame(checks).to_csv(OUT / 'verification_scenarios.csv', index=False, encoding='utf-8-sig')
-(OUT / 'solver.log').write_text('\n'.join(log) + '\n', encoding='utf-8')
+print('\n'.join(log))
 pd.DataFrame({'Зона': range(1, n+1), 'Баланс': balance, 'Фактический баланс': net,
               'Невязка': residual}).to_csv(OUT / 'verification_nodes.csv', index=False, encoding='utf-8-sig')
 flows = pd.DataFrame(arcs)
@@ -148,12 +175,14 @@ closure_text = (f'стоимость {closure.fun:.2f}, рост {closure.fun-ba
 active_text = ', '.join(f"{arcs[k]['from']}→{arcs[k]['to']} (оценка {base.upper.marginals[k]:.2f} руб./авто)" for k in active) or 'нет'
 zero_arcs = sum(base.x < 1e-7)
 integer = milp(cost, integrality=np.ones(m), bounds=Bounds(np.zeros(m), capacity),
-               constraints=LinearConstraint(A, balance, balance), options={'presolve': True})
+               constraints=LinearConstraint(A, balance, balance), options={'presolve': True, 'disp': True})
 if not integer.success:
     raise RuntimeError(f'Целочисленная модель не решена: {integer.message}')
 _, _, integer_violation, integer_cost = verify(integer.x, balance, capacity)
 integrality_violation = float(np.max(np.abs(integer.x - np.round(integer.x))))
 assert integer_violation <= 1e-7 and integrality_violation <= 1e-7
+assert abs(integer_cost - integer.fun) <= 1e-7
+flows.assign(milp_flow=integer.x).to_csv(OUT / 'integer_plan.csv', index=False, encoding='utf-8-sig')
 pd.DataFrame([{'Статус': integer.message, 'Стоимость': integer_cost,
                'Разница с LP': integer_cost-base.fun, 'Невязка': integer_violation,
                'Невязка целочисленности': integrality_violation}]).to_csv(
@@ -172,6 +201,8 @@ report = f'''# Лабораторная работа № 2. Вариант 14: �
 Независимый код обходит исходный список дуг, не используя матрицу модели или объект ограничений солвера. Он проверяет баланс в каждой вершине и обе границы каждой дуги, отдельно пересчитывает стоимость. Максимальное нарушение {violation:.3g} при допуске 1e-7, независимая стоимость {independent_cost:.2f} руб. Подробности — `verification_nodes.csv`, `solution.csv`, `verification_scenarios.csv`.
 
 ## Сценарии
+![Схема сети с потоками и пропускными способностями](network.png)
+
 ```
 {pd.DataFrame(rows).to_string(index=False)}
 ```

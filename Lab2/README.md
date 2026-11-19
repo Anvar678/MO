@@ -8,7 +8,6 @@
 
 ```powershell
 python -m pip install -r requirements.txt
-$env:PYTHONIOENCODING = 'utf-8'
 python run.py
 ```
 
@@ -22,7 +21,7 @@ python run.py
 - `outputs/network.png` — схема с потоками и пропускными способностями.
 - `outputs/solution.csv`, `scenarios.csv`, `plan_*.csv` — решение и планы допустимых сценариев.
 - `verification_nodes.csv`, `verification_scenarios.csv` — результаты независимой проверки; нарушения границ каждой дуги находятся в `solution.csv`.
-- `shadow_prices.csv`, `greedy.csv`, `integer_comparison.csv` — сравнение теневых оценок, эвристики и дополнительной целочисленной модели.
-- `solver.log` — статусы и число итераций через интерфейс SciPy, не подробный нативный лог HiGHS.
+- `shadow_prices.csv`, `greedy.csv`, `integer_comparison.csv`, `integer_plan.csv` — проверка теневых оценок, сравнение с эвристикой и результаты дополнительной целочисленной модели.
+- `solver.log` — нативный вывод HiGHS 1.12.0 и сводка сценариев.
 
 При росте спроса на 20% задача несовместна: машин меньше, чем спроса. Реальные тарифы, водители, пробки, динамика спроса и время поездок в упрощённой модели не учитываются.
