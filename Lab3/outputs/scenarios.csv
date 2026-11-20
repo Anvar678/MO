@@ -1,0 +1,4 @@
+﻿scenario,id,status,score,change_from_base,best_bound,mip_gap_pct,mip_nodes,unavailable,extra_conflicts,extra_required_hours
+Базовый,base,optimal,696.0,0.0,696.0,0.0,1,,,0
+Дефицитный,deficit,optimal,688.0,-8.0,688.0,0.0,1,P01,,0
+Стрессовый,stress,optimal,658.0,-38.0,658.0,0.0,1,"P01, P06",P02/P04,1

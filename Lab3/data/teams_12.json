@@ -1,0 +1,211 @@
+{
+  "variant": 14,
+  "seed": 10031,
+  "roles": [
+    "Разработчик",
+    "Аналитик",
+    "Координатор"
+  ],
+  "candidates": [
+    {
+      "id": "P01",
+      "role": "Разработчик",
+      "hours": 5
+    },
+    {
+      "id": "P02",
+      "role": "Аналитик",
+      "hours": 7
+    },
+    {
+      "id": "P03",
+      "role": "Координатор",
+      "hours": 7
+    },
+    {
+      "id": "P04",
+      "role": "Разработчик",
+      "hours": 9
+    },
+    {
+      "id": "P05",
+      "role": "Аналитик",
+      "hours": 10
+    },
+    {
+      "id": "P06",
+      "role": "Координатор",
+      "hours": 7
+    },
+    {
+      "id": "P07",
+      "role": "Разработчик",
+      "hours": 10
+    },
+    {
+      "id": "P08",
+      "role": "Аналитик",
+      "hours": 5
+    },
+    {
+      "id": "P09",
+      "role": "Координатор",
+      "hours": 5
+    },
+    {
+      "id": "P10",
+      "role": "Разработчик",
+      "hours": 5
+    },
+    {
+      "id": "P11",
+      "role": "Аналитик",
+      "hours": 8
+    },
+    {
+      "id": "P12",
+      "role": "Координатор",
+      "hours": 10
+    }
+  ],
+  "teams": [
+    {
+      "id": "T01",
+      "required_hours": 23,
+      "reserve_cap": 10,
+      "reserve_fixed": 8,
+      "reserve_hourly": 2
+    },
+    {
+      "id": "T02",
+      "required_hours": 24,
+      "reserve_cap": 10,
+      "reserve_fixed": 9,
+      "reserve_hourly": 2
+    },
+    {
+      "id": "T03",
+      "required_hours": 25,
+      "reserve_cap": 10,
+      "reserve_fixed": 10,
+      "reserve_hourly": 2
+    }
+  ],
+  "scores": [
+    [
+      50,
+      80,
+      71
+    ],
+    [
+      76,
+      77,
+      45
+    ],
+    [
+      93,
+      74,
+      69
+    ],
+    [
+      80,
+      73,
+      76
+    ],
+    [
+      59,
+      81,
+      68
+    ],
+    [
+      59,
+      63,
+      70
+    ],
+    [
+      57,
+      67,
+      71
+    ],
+    [
+      74,
+      68,
+      82
+    ],
+    [
+      49,
+      65,
+      68
+    ],
+    [
+      54,
+      72,
+      81
+    ],
+    [
+      64,
+      53,
+      65
+    ],
+    [
+      78,
+      80,
+      83
+    ]
+  ],
+  "conflicts": [
+    [
+      "P01",
+      "P08"
+    ],
+    [
+      "P03",
+      "P11"
+    ],
+    [
+      "P05",
+      "P07"
+    ],
+    [
+      "P05",
+      "P12"
+    ],
+    [
+      "P06",
+      "P11"
+    ]
+  ],
+  "scenarios": [
+    {
+      "id": "base",
+      "name": "Базовый",
+      "unavailable": [],
+      "extra_conflicts": [],
+      "extra_required_hours": 0
+    },
+    {
+      "id": "deficit",
+      "name": "Дефицитный",
+      "unavailable": [
+        "P01"
+      ],
+      "extra_conflicts": [],
+      "extra_required_hours": 0
+    },
+    {
+      "id": "stress",
+      "name": "Стрессовый",
+      "unavailable": [
+        "P01",
+        "P06"
+      ],
+      "extra_conflicts": [
+        [
+          "P02",
+          "P04"
+        ]
+      ],
+      "extra_required_hours": 1
+    }
+  ]
+}

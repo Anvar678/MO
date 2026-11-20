@@ -1,0 +1,8 @@
+﻿scenario,method,score_recalculated,objective_error,max_violation,tolerance
+base,LP,703.2,0.0,0.0,1e-07
+base,MILP,696.0,0.0,0.0,1e-07
+base,greedy,667.0,,0.0,1e-07
+deficit,MILP,688.0,0.0,0.0,1e-07
+deficit,greedy,667.0,,0.0,1e-07
+stress,MILP,658.0,0.0,0.0,1e-07
+stress,greedy,652.0,,0.0,1e-07
